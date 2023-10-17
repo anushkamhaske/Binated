@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Blog Post Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 80%;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        form {
+            width: 80%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+        button {
+            padding: 10px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Blog Post Management</h1>
+
+    
+
+    <!-- Create Blog Form -->
+    <form id="create-form">
+        <h2>Create New Blog Post</h2>
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required><br>
+
+        <label for="content">Content:</label>
+        <textarea id="content" name="content" rows="4" required></textarea><br>
+
+        <button class="create-button" type="submit">Create</button>
+    </form>
+
+    <!-- Edit Blog Form -->
+    <form id="edit-form" style="display: none;">
+        <h2>Edit Blog Post</h2>
+        <input type="hidden" id="edit-id" name="edit-id">
+        <label for="edit-title">Title:</label>
+        <input type="text" id="edit-title" name="edit-title" required><br>
+
+        <label for="edit-content">Content:</label>
+        <textarea id="edit-content" name="edit-content" rows="4" required></textarea><br>
+
+        <button class="update-button">Update</button>
+        <button class="cancel-button">Cancel</button>
+    </form>
+
+    <script>
+        // Sample data (for demonstration)
+        const blogPosts = [
+            { id: 1, title: "Sample Blog 1", content: "This is the content of the first blog post." },
+            { id: 2, title: "Sample Blog 2", content: "This is the content of the second blog post." }
+        ];
+
+        // Function to populate the table with blog posts
+        function populateTable() {
+            const table = document.querySelector("table");
+            table.innerHTML = `
+                <tr>
+                    <th>Title</th>
+                    <th>Content</th>
+                    <th>Action</th>
+                </tr>
+            `;
+            blogPosts.forEach(post => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${post.title}</td>
+                    <td>${post.content}</td>
+                    <td>
+                        <button class="edit-button" data-id="${post.id}">Edit</button>
+                        <button class="delete-button" data-id="${post.id}">Delete</button>
+                    </td>
+                `;
+                table.appendChild(row);
+            });
+        }
+
+        // Function to show the create form and hide the edit form
+        function showCreateForm() {
+            document.getElementById("create-form").style.display = "block";
+            document.getElementById("edit-form").style.display = "none";
+        }
+
+        // Function to show the edit form and populate it with data
+        function showEditForm(id) {
+            const post = blogPosts.find(post => post.id === id);
+            if (post) {
+                document.getElementById("create-form").style.display = "none";
+                document.getElementById("edit-form").style.display = "block";
+                document.getElementById("edit-id").value = post.id;
+                document.getElementById("edit-title").value = post.title;
+                document.getElementById("edit-content").value = post.content;
+            }
+        }
+
+        // Event listener for creating a new blog post
+        document.getElementById("create-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const title = document.getElementById("title").value;
+            const content = document.getElementById("content").value;
+            if (title && content) {
+                const id = blogPosts.length + 1;
+                blogPosts.push({ id, title, content });
+                populateTable();
+                showCreateForm();
+            }
+        });
+
+        // Event listener for updating a blog post
+        document.getElementById("edit-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            const id = parseInt(document.getElementById("edit-id").value);
+            const title = document.getElementById("edit-title").value;
+            const content = document.getElementById("edit-content").value;
+            if (id && title && content) {
+                const postIndex = blogPosts.findIndex(post => post.id === id);
+                if (postIndex !== -1) {
+                    blogPosts[postIndex] = { id, title, content };
+                    populateTable();
+                    showCreateForm();
+                }
+            }
+        });
+
+        // Event listener for editing a blog post
+        document.querySelectorAll(".edit-button").forEach(button => {
+            button.addEventListener("click", function () {
+                const id = parseInt(this.getAttribute("data-id"));
+                showEditForm(id);
+            });
+        });
+
+        // Event listener for deleting a blog post
+        document.querySelectorAll(".delete-button").forEach(button => {
+            button.addEventListener("click", function () {
+                const id = parseInt(this.getAttribute("data-id"));
+                const postIndex = blogPosts.findIndex(post => post.id === id);
+                if (postIndex !== -1) {
+                    blogPosts.splice(postIndex, 1);
+                    populateTable();
+                }
+            });
+        });
+
+        // Initial population of the table
+        populateTable();
+        showCreateForm();
+    </script>
+    <!-- Blog List -->
+    <table>
+        <tr>
+            <th>Title</th>
+            <th>Content</th>
+            <th>Action</th>
+        </tr>
+        <tr>
+            <td>Sample Blog 1</td>
+            <td>This is the content of the first blog post.</td>
+            <td>
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
+            </td>
+        </tr>
+        <tr>
+            <td>Sample Blog 2</td>
+            <td>This is the content of the second blog post.</td>
+            <td>
+                <button class="edit-button">Edit</button>
+                <button class="delete-button">Delete</button>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
